@@ -5,12 +5,38 @@ import sys
 import select
 import termios
 import tty
+import requests
+from openai import OpenAI
 
 class DobbyCLI:
     def __init__(self, command):
         self.command = command  # Command to be executed (e.g., ssh, telnet)
 
+    def query_llm(self, request):
+        """Send the intercepted request to the LLM and get the response."""
+        client = OpenAI(
+            base_url = 'http://localhost:11434/v1',
+            api_key='ollama', # required, but unused
+        )
+
+        response = client.chat.completions.create(
+            model="llama2",
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "You are an expert network engineer assistant specialized in Cisco router and switch configurations. Your job is to suggest the exact CLI command that best fits the user's request based on their prompt. Be concise, precise, and only return the CLI command needed. Do not provide explanations or additional context unless specifically asked. The goal is to help network engineers quickly identify the correct command to configure or troubleshoot their devices."
+                },
+                {"role": "user", "content": "check the IP addresses of all interfaces"},
+                {"role": "assistant", "content": "show ip interface brief"},
+                {"role": "user", "content": "reload the module in slot 1/0"},
+                {"role": "assistant", "content": "hw-module subslot 1/0 reload"},
+                {"role": "user", "content": f"{request}"}
+            ]
+        )
+        return response.choices[0].message.content
+
     def run(self):
+        """Intercept and Process the Commands Entered by the User"""
         # Create a pseudo-terminal
         # Use master_fd to intercept terminal output
         master_fd, slave_fd = pty.openpty()
@@ -35,7 +61,7 @@ class DobbyCLI:
 
                     # Add user input to buffer to accumulate the full line
                     buffer += user_input
-                    print(f"\r\nBuffer={repr(buffer)}\r\n")
+                    # print(f"\r\nBuffer={repr(buffer)}\r\n")
 
                     if user_input == '\x03':  # Handle Ctrl-C to exit
                         break
@@ -43,10 +69,9 @@ class DobbyCLI:
                     # Read full command if the user presses Enter
                     if user_input == '\r':
                         # user_input = sys.stdin.readline()
-                        print(f"User typed (full line): {repr(buffer)}")  # Debugging: show full input
+                        # print(f"User typed (full line): {repr(buffer)}")  # Debugging: show full input
                         
-                        # Check if the user typed "//" for auto-completion
-                        # if "//" in user_input:
+                        # Check if the user typed "//" for prompt
                         if "//" in buffer:
                             # Split the command after the "//"
                             request = buffer.split("//", 1)[1].strip()
@@ -56,7 +81,11 @@ class DobbyCLI:
                             # Clear buffer after handling the line
                             buffer = ""
 
-                            # Instead of sending to the device, you can just intercept here
+                            # Instead of sending to the device, just intercept here
+                            # Send the intercepted command to the LLM
+                            llm_response = self.query_llm(request)
+                            print(f"LLM Response: {llm_response}\n")
+
                             continue
 
                         # Send the regular input (no "//") to the device
