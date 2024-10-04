@@ -5,7 +5,7 @@ import sys
 import select
 import termios
 import tty
-import requests
+import signal
 from openai import OpenAI
 
 class DobbyCLI:
@@ -43,10 +43,21 @@ class DobbyCLI:
 
         # Start the SSH/Telnet process with the given command
         process = subprocess.Popen(self.command, preexec_fn=os.setsid, stdin=slave_fd, stdout=slave_fd, stderr=slave_fd, shell=True)
-        
+
         # Set the terminal to raw mode
         old_tty = termios.tcgetattr(sys.stdin)
         tty.setraw(sys.stdin.fileno())
+
+        def handle_exit(signum, frame):
+            """Handle Ctrl+C and other exits."""
+            print("\r\nExiting Dobby-CLI...\r\n")
+            if process.poll() is None:  # Check if process is still running
+                os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # Kill the SSH/telnet process
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)  # Restore terminal settings
+            sys.exit(0)  # Exit the program
+
+        # Bind SIGINT (Ctrl+C) to the handle_exit function
+        signal.signal(signal.SIGINT, handle_exit)
 
         try:
             buffer = ""  # Buffer to accumulate the full line of user input
@@ -57,43 +68,51 @@ class DobbyCLI:
 
                 # If the user has typed something
                 if sys.stdin in rlist:
-                    user_input = sys.stdin.read(1)
+                    # Read multiple characters to handle paste operation correctly
+                    try:
+                        user_input = os.read(sys.stdin.fileno(), 1024).decode('utf-8')  # Read up to 1024 characters at once
+                    except OSError:
+                        continue
 
-                    # Add user input to buffer to accumulate the full line
-                    buffer += user_input
-                    # print(f"\r\nBuffer={repr(buffer)}\r\n")
+                    for char in user_input:
+                        # Handle Ctrl+C (manually handle '\x03' for raw mode)
+                        if char == '\x03':  # Ctrl+C
+                            handle_exit(None, None)  # Call exit handler directly
 
-                    if user_input == '\x03':  # Handle Ctrl-C to exit
-                        break
-                    
-                    # Read full command if the user presses Enter
-                    if user_input == '\r':
-                        # user_input = sys.stdin.readline()
-                        # print(f"User typed (full line): {repr(buffer)}")  # Debugging: show full input
-                        
-                        # Check if the user typed "//" for prompt
-                        if "//" in buffer:
-                            # Split the command after the "//"
-                            request = buffer.split("//", 1)[1].strip()
-                            print(f"\r\nIntercepted command for LLM: {request}\r\n")
-                            # You'd now send this request to your LLM and handle the response
-
-                            # Clear buffer after handling the line
-                            buffer = ""
-
-                            # Instead of sending to the device, just intercept here
-                            # Send the intercepted command to the LLM
-                            llm_response = self.query_llm(request)
-                            print(f"LLM Response: {llm_response}\n")
-
+                        # Handle backspace (delete character from the buffer)
+                        if char == '\x7f':  # Backspace key
+                            if buffer:
+                                buffer = buffer[:-1]
+                                sys.stdout.write('\b \b')
+                                sys.stdout.flush()
                             continue
 
-                        # Send the regular input (no "//") to the device
-                        os.write(master_fd, buffer.encode())
+                        # Handle Enter key
+                        if char == '\r': 
+                            sys.stdout.write("\r\n")
 
-                        # Clear buffer after sending the line
-                        buffer = ""
-                        continue
+                            # Check if the user typed "//" for prompt
+                            if "//" in buffer:
+                                # Split the command after the "//"
+                                request = buffer.split("//", 1)[1].strip()
+                                print(f"\r\nIntercepted command for LLM: {request}\r\n")
+                                # Clear buffer after handling the line
+                                buffer = ""
+                                # Instead of sending to the device, just intercept here
+                                # Send the intercepted command to the LLM
+                                llm_response = self.query_llm(request)
+                                print(f"LLM Response: {llm_response}\n")
+                                continue
+
+                            # Send the regular input (no "//") to the device
+                            os.write(master_fd, (buffer + "\n").encode())
+                            # Clear buffer after sending the line
+                            buffer = ""
+                            continue
+
+                        buffer += char
+                        sys.stdout.write(char)
+                        sys.stdout.flush()
 
                 # If there's output from the terminal (remote device)
                 if master_fd in rlist:
@@ -103,11 +122,19 @@ class DobbyCLI:
                     sys.stdout.write(data.decode('utf-8'))
                     sys.stdout.flush()
 
+        except SystemExit:
+            # Handle cleanup if sys.exit() is called
+            pass
+
         finally:
-            # Restore the terminal settings
+            # Restore terminal settings and clean up the process
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
-            # Wait for the process to terminate
-            process.wait()
+            if process.poll() is None:  # Check if the process is still running
+                try:
+                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # Kill the process group if still running
+                except ProcessLookupError:
+                    pass  # Process already terminated, so we ignore the error
+            process.wait()  # Ensure the process is waited on properly
 
 # Example usage
 if __name__ == "__main__":
