@@ -15,15 +15,15 @@ class DobbyCLI:
     def query_llm(self, request):
         """Send the intercepted request to the LLM and get the response."""
         client = OpenAI(
-            base_url = 'http://localhost:11434/v1',
-            api_key='ollama', # required, but unused
+            base_url='http://localhost:11434/v1',
+            api_key='ollama',  # required, but unused
         )
 
         response = client.chat.completions.create(
             model="llama2",
             messages=[
                 {
-                    "role": "system", 
+                    "role": "system",
                     "content": "You are an expert network engineer assistant specialized in Cisco router and switch configurations. Your job is to suggest the exact CLI command that best fits the user's request based on their prompt. Be concise, precise, and only return the CLI command needed. Do not provide explanations or additional context unless specifically asked. The goal is to help network engineers quickly identify the correct command to configure or troubleshoot their devices."
                 },
                 {"role": "user", "content": "check the IP addresses of all interfaces"},
@@ -50,7 +50,7 @@ class DobbyCLI:
 
         def handle_exit(signum, frame):
             """Handle Ctrl+C and other exits."""
-            print("\r\nExiting Dobby-CLI...\r\n")
+            print("\r\nExiting Dobby-CLI...\r")
             if process.poll() is None:  # Check if process is still running
                 os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # Kill the SSH/telnet process
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)  # Restore terminal settings
@@ -87,21 +87,39 @@ class DobbyCLI:
                                 sys.stdout.flush()
                             continue
 
+                        # Detect when the user starts typing "//"
+                        if buffer.endswith("//"):
+                            sys.stdout.write("\033[1;90m")  # Start grey mode
+                            sys.stdout.write('\b \b' + '\b \b')  # Delete "//"
+                            sys.stdout.write("//")  # Print again in grey
+                            sys.stdout.flush()
+
                         # Handle Enter key
                         if char == '\r': 
-                            sys.stdout.write("\r\n")
+                            # Only write a new line if buffer is not empty
+                            if buffer.strip():
+                                sys.stdout.write("\r\n")
 
                             # Check if the user typed "//" for prompt
                             if "//" in buffer:
+                                # Change text color to grey for LLM interception
+                                sys.stdout.write("\033[1;90m")
+                                sys.stdout.flush()
+
                                 # Split the command after the "//"
                                 request = buffer.split("//", 1)[1].strip()
-                                print(f"\r\nIntercepted command for LLM: {request}\r\n")
-                                # Clear buffer after handling the line
-                                buffer = ""
-                                # Instead of sending to the device, just intercept here
+                                print(f"\rIntercepted command for LLM: {request}\r")
+                                
                                 # Send the intercepted command to the LLM
                                 llm_response = self.query_llm(request)
-                                print(f"LLM Response: {llm_response}\n")
+                                print(f"LLM Response: {llm_response}\r")
+
+                                # Reset text color to default after LLM response
+                                sys.stdout.write("\033[0m")
+                                sys.stdout.flush()
+
+                                # Clear buffer after handling the line
+                                buffer = ""
                                 continue
 
                             # Send the regular input (no "//") to the device
