@@ -7,6 +7,8 @@ import termios
 import tty
 import signal
 import re
+import threading
+import time
 from openai import OpenAI
 from InquirerPy import inquirer, get_style
 from prompt_toolkit.styles import Style
@@ -76,11 +78,25 @@ class DobbyCLI:
             message="Choose one of the recommended CLI commands:",
             choices=options,
             style=custom_style,
-            pointer="->",
+            pointer="✅",
             border=True,
             show_cursor=False
         ).execute()
         return choice
+    
+    def spinner(self, stop_event):
+        # """Display a rotating spinner until stop_event is set."""
+        # spinner_chars = ['/', '--', '|', '\\']
+        """Display a rotating moon spinner until stop_event is set."""
+        spinner_chars = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘']
+        while not stop_event.is_set():
+            for char in spinner_chars:
+                if stop_event.is_set():
+                    break
+                sys.stdout.write(f'\rJust a sec...{char}')
+                sys.stdout.flush()
+                time.sleep(0.2)
+
 
     def run(self):
         """Intercept and Process the Commands Entered by the User"""
@@ -97,7 +113,7 @@ class DobbyCLI:
 
         def handle_exit(signum, frame):
             """Handle Ctrl+C and other exits."""
-            print("\r\nExiting Dobby-CLI...\r")
+            print("\r\nExiting Dobby-CLI...Bye!\r")
             if process.poll() is None:  # Check if process is still running
                 os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # Kill the SSH/telnet process
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)  # Restore terminal settings
@@ -155,15 +171,24 @@ class DobbyCLI:
 
                                 # Split the command after the "//"
                                 request = buffer.split("//", 1)[1].strip()
-                                print(f"\rIntercepted command for LLM: {request}\r")
+                                print(f"\rIntercepted query for LLM🌟 : {request}\r")
+
+                                # Start spinner in a separate thread
+                                stop_spinner_event = threading.Event()
+                                spinner_thread = threading.Thread(target=self.spinner, args=(stop_spinner_event,))
+                                spinner_thread.start()
                                 
                                 # Send the intercepted command to the LLM
                                 llm_response = self.query_llm(request)
-                                print(f"LLM Response: {llm_response}\r")
+                                print(f"\rLLM🌟 Response: {llm_response}\r")
+
+                                # Stop the spinner once the LLM response is received
+                                stop_spinner_event.set()
+                                spinner_thread.join()  # Wait for the spinner thread to finish
 
                                 # Use InquirerPy to display options and get the user's choice
                                 selected_command = self.prompt_user_for_selection(llm_response)
-                                print(f"Selected command: {selected_command}\r")
+                                print(f"Selected command : ✅ {selected_command}\r")
 
                                 # Reset text color to default after LLM response
                                 sys.stdout.write("\033[0m")
