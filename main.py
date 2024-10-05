@@ -71,6 +71,7 @@ class DobbyCLI:
             'instruction': '#ff8000 bold',               # Instruction (default)
             "long_instruction": "#ff8000 bold",                      # Plain text (default)
         })
+        options.append("cancel")  # Add an cancel option
         choice = inquirer.select(
             message="Choose one of the recommended CLI commands:",
             choices=options,
@@ -162,16 +163,59 @@ class DobbyCLI:
 
                                 # Use InquirerPy to display options and get the user's choice
                                 selected_command = self.prompt_user_for_selection(llm_response)
-                                
                                 print(f"Selected command: {selected_command}\r")
 
                                 # Reset text color to default after LLM response
                                 sys.stdout.write("\033[0m")
-                                sys.stdout.flush()
+                                
+                                if selected_command != "cancel":
+                                    # Write the selected command after the router prompt and allow user to modify it
+                                    sys.stdout.write("\r\nElixir_03#")  # Assuming your router prompt is 'Elixir_03#'
+                                    sys.stdout.write(selected_command)  # Write the selected command to the terminal
+                                    sys.stdout.flush()
 
-                                # Clear buffer after handling the line
-                                buffer = ""
-                                continue
+                                    # Capture any user modifications to the selected_command before executing
+                                    buffer = selected_command  # Initialize buffer with the selected command
+
+                                    while True:
+                                        exit_loop = False
+                                        # Read user input for potential modifications to the selected command
+                                        try:
+                                            user_input = os.read(sys.stdin.fileno(), 1024).decode('utf-8')
+                                        except OSError:
+                                            continue
+
+                                        for char in user_input:
+                                            # Handle Enter key to send the command to the router
+                                            if char == '\r':
+                                                sys.stdout.write("\r\n")
+                                                os.write(master_fd, (buffer + "\n").encode())  # Send the final command to the router
+                                                sys.stdout.flush()
+                                                buffer = ""  # Clear the buffer
+                                                exit_loop = True
+                                                break  # Exit this loop to return to the main loop
+
+                                            # Handle backspace to allow editing
+                                            if char == '\x7f':
+                                                if buffer:
+                                                    buffer = buffer[:-1]  # Remove the last character from buffer
+                                                    sys.stdout.write('\b \b')  # Move cursor back and delete char visually
+                                                    sys.stdout.flush()
+                                                continue
+
+                                            # Add the user's input to the buffer
+                                            buffer += char
+                                            sys.stdout.write(char)  # Echo the character to the terminal
+                                            sys.stdout.flush()
+                                        
+                                        if exit_loop:
+                                            break
+
+                                    # Clear buffer after handling the line
+                                    buffer = ""
+                                    continue
+                                else:
+                                    buffer = ""
 
                             # Send the regular input (no "//") to the device
                             os.write(master_fd, (buffer + "\n").encode())

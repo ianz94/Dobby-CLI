@@ -1,7 +1,7 @@
 # Dobby-CLI
 
 <div align="center">
-  <img src="./assets/Dobby-CLI-Logo.png" alt="Logo" width="350">
+  <img src="./assets/Dobby-CLI-Logo.png" alt="Logo" width="200">
 </div>
 
 Yes, just as the name indicates, Dobby-CLI atcs like a smart house-elf who resides in the terminal and hopes to make its poor friend's life easier, especially those network engineers who struggle with remembering their CLIs.
