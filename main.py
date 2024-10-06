@@ -11,7 +11,6 @@ import threading
 import time
 from openai import OpenAI
 from InquirerPy import inquirer, get_style
-from prompt_toolkit.styles import Style
 
 class DobbyCLI:
     def __init__(self, command):
@@ -58,24 +57,22 @@ class DobbyCLI:
         """Prompt the user to choose one of the LLM's suggestions."""
         # Define a custom style for orange and bold font
         custom_style = get_style({
-            'text': 'green',
-            'texts': 'fg:#ff8000 bg:black',
             "input": "#98c379",
-            'questionmark': '#ff8000 bold',  # Question mark style
-            'question': 'fg:#ff8000 bg:black',      # Question style
-            "answered_question": '#ff8000 bold',
-            'answer': 'green bold',        # User input style
+            "questionmark": "#ff8000 bold",
+            "question": "#ff8000 bold italic",
+            "answered_question": "#ff8000 bold",
+            "answer": "green bold",
             "answermark": "#e5c07b",
-            'pointer': 'green bold',       # Pointer style
-            'highlighted': 'green bold underline',   # Highlighted option style
-            'selected': '#ff8000 bold',      # Style for selected options
-            'separator': '#cc5454',          # Separator color
-            'instruction': '#ff8000 bold',               # Instruction (default)
-            "long_instruction": "#ff8000 bold",                      # Plain text (default)
+            "pointer": "green bold",
+            "highlighted": "green bold underline",
+            "selected": "#ff8000 bold",
+            "separator": "#cc5454",
+            "instruction": "#ff8000 bold",
+            "long_instruction": "#ff8000 bold",
         })
         options.append("cancel")  # Add an cancel option
         choice = inquirer.select(
-            message="Choose one of the recommended CLI commands:",
+            message="Choose one of the recommended CLI commands ⬆️ ⬇️ :",
             choices=options,
             style=custom_style,
             pointer="✅",
@@ -85,8 +82,6 @@ class DobbyCLI:
         return choice
     
     def spinner(self, stop_event):
-        # """Display a rotating spinner until stop_event is set."""
-        # spinner_chars = ['/', '--', '|', '\\']
         """Display a rotating moon spinner until stop_event is set."""
         spinner_chars = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘']
         while not stop_event.is_set():
@@ -188,7 +183,9 @@ class DobbyCLI:
 
                                 # Use InquirerPy to display options and get the user's choice
                                 selected_command = self.prompt_user_for_selection(llm_response)
-                                print(f"Selected command : ✅ {selected_command}\r")
+
+                                # sys.stdout.write("\033[1m\033[38;5;208m")
+                                # print(f"Selected command : ✅ {selected_command}\r")
 
                                 # Reset text color to default after LLM response
                                 sys.stdout.write("\033[0m")
