@@ -8,6 +8,10 @@ Yes, just as the name indicates, Dobby-CLI atcs like a smart house-elf who resid
 
 All you need to do is to summon it in the midst of working on your Cisco switch/router, and talk to it in natural language.
 
+<div align="center">
+  <img src="./assets/Dobby-Demo.gif">
+</div>
+
 Its capabilities include:
 - Read through your Cisco device console messages on the terminal to understand your situation.
 - Auto-complete or suggest what CLI you should use. Options will be available for you to choose from.
