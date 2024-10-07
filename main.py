@@ -9,6 +9,7 @@ import signal
 import re
 import threading
 import time
+import argparse
 from openai import OpenAI
 from InquirerPy import inquirer, get_style
 
@@ -271,7 +272,19 @@ class DobbyCLI:
                     pass  # Process already terminated, so we ignore the error
             process.wait()  # Ensure the process is waited on properly
 
-# Example usage
+def main():
+    # Use argparse to handle command-line arguments
+    parser = argparse.ArgumentParser(description="Dobby CLI - Smart Assistant for Network Engineers.")
+    # Add the 'command' argument (capture the command and all its arguments)
+    parser.add_argument('command', nargs=argparse.REMAINDER, help='The command to connect to the Cisco device, e.g., "telnet 10.1.2.3 10"')
+    # Parse the arguments from the command line
+    args = parser.parse_args()
+    # Convert the list of arguments into a single string
+    full_command = " ".join(args.command)
+    # Initialize and run the DobbyCLI tool with the full command
+    DobbyCLI(full_command).run()
+
 if __name__ == "__main__":
-    # Use my Elixir-03 for testing
-    DobbyCLI("telnet 10.75.221.155 2013").run()
+    # # Use my Elixir-03 for testing
+    # DobbyCLI("telnet 10.75.221.155 2013").run()
+    main()
