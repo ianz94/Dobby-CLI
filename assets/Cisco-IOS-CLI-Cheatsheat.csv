@@ -1,0 +1,189 @@
+enable,Enter privileged EXEC mode
+configure terminal,Enter global configuration mode
+write memory,Save the configuration to NVRAM
+show interfaces,Displays status and statistics for all interfaces
+show interface <interface>,Shows detailed information about a specific interface
+show interfaces status,Provides a quick overview of all interfaces' status
+show interface [INTERFACE_NAME] switchport,Displays switchport information for a specific interface
+show interface [INTERFACE_NAME] status,Shows the status of a specific interface
+show interface [INTERFACE_NAME] counters,Shows detailed counters for a specific interface
+show interface counters errors,Displays interface error counters
+show interfaces description,Displays interface descriptions and status
+test cable-diagnostics tdr interface [INTERFACE_NAME],Runs a Time Domain Reflectometer (TDR) test on a specified interface
+show vlan,Displays all VLAN information
+show vlan brief,Provides a brief summary of all VLANs
+vlan [VLAN_ID],Creates a VLAN or enters VLAN configuration mode
+show interfaces trunk,Displays trunk ports and their encapsulation.
+switchport mode access,Sets an interface to access mode
+switchport mode trunk,Sets an interface to trunk mode
+switchport access vlan [VLAN_ID],Assigns an access VLAN to an interface
+switchport trunk allowed vlan [VLAN_LIST],Specifies VLANs allowed on a trunk interface
+show ip route,Displays the routing table
+show ip route vrf <vrf-name>,Shows the routing table of a specific VRF
+show ipv6 route,Displays the IPv6 routing table
+show spanning-tree,Displays Spanning Tree Protocol (STP) information
+show spanning-tree summary,Shows a summary of STP status
+show spanning-tree root,Displays the root bridge information for STP
+show spanning-tree [vlan VLAN_ID],Shows STP information for a specific VLAN
+debug spanning-tree events,Enables debugging for STP events
+show etherchannel summary,Provides a summary of EtherChannel status
+channel-group [NUMBER] mode active,Configures an interface to actively form an EtherChannel
+show port-security,Displays port security settings
+show port-security interface [interface],Shows port security details on a specific interface.
+show cdp neighbors,Lists directly connected Cisco devices.
+show cdp neighbors detail,Provides detailed information about directly connected Cisco neighbors.
+show lldp neighbors,Lists Link Layer Discovery Protocol (LLDP) neighbor devices.
+show lldp neighbors detail,Provides detailed information about LLDP neighbors.
+show environment,Displays environmental information like temperature and power supply status.
+show version,Displays system hardware and software status.
+show inventory,Shows hardware inventory details.
+show running-config interface [INTERFACE_NAME],Shows the running configuration of a specific interface.
+show ip interface brief,Summarizes the status of all interfaces including IP addresses and operational status.
+show ip interface brief | include up,Shows the configured IP addresses that are up
+show processes cpu,Shows CPU utilization.
+show processes memory,Displays memory usage.
+show logging,Displays the system log for potential error messages or alerts.
+copy running-config startup-config,Saves the current configuration to the startup configuration.
+show boot,Shows boot path and image information.
+show flash:,Displays the contents of the flash memory.
+show mac address-table,Displays the MAC address table.
+show mac address-table dynamic,Shows dynamically learned MAC addresses.
+show arp,Shows the ARP table.
+clear mac address-table dynamic,Clears the dynamic entries from the MAC address table.
+show vtp status,Displays VLAN Trunking Protocol (VTP) status.
+show udld [INTERFACE_NAME],Shows UniDirectional Link Detection (UDLD) status on an interface.
+clear counters [interface],Clears the counters on a specific interface.
+show sdm prefer,Shows the Switch Database Management (SDM) template in use.
+show standby,Displays Hot Standby Router Protocol (HSRP) information.
+show access-lists,Displays configured ACL access lists.
+show power inline,Shows Power over Ethernet (PoE) status on interfaces.
+show redundancy,Displays redundancy information (useful in MLAG setups).
+show vrf,Displays VRF (Virtual Routing and Forwarding) information.
+show mlag,Displays MLAG configuration and status.
+mlag peer,Configures MLAG peer settings.
+mlag domain,Configures an MLAG domain.
+show mlag detail,Provides detailed information about MLAG status.
+ip domain-name [mydomain.com],Set a Domain Name
+crypto key generate rsa,Generate RSA Keys
+username [admin] privilege 15 secret [adminpassword],Create a local username and password for SSH access
+clock timezone EST -5,Sets clock to eastern US time
+no clock timezone,Revert to default timezone
+show ip dhcp pool,Verify DHCP Pool
+no service dhcp,Disable DHCP
+show ip dhcp server statistics,DHCP Verification
+no ip dhcp pool managementpool,Delete DHCP Pool
+show ip bgp summary,Summary of BGP IPv4 neighbor status
+show ip bgp ipv4 unicast summary,Summary of BGP IPv4 neighbor status
+show ip bgp ipv6 unicast summary,Summary of BGP IPv6 neighbor status
+show ip bgp,IPv4 BGP Prefixes
+show ip bgp ipv6 unicast,IPv6 BGP Prefixes
+show running-configuration,Displays the configuration currently running in RAM
+show startup-configuration,Displays the saved configuration located in NVRAM
+request platform software system shell,Enter Linux shell
+ip routing,Enable IPv4 Routing Functionality
+ip route <destination> <subnet-mask> <nexthop>,Create a IPv4 static route
+ip multicast-routing,Enable multicast routing
+ipv6 unicast-routing,Enable IPv6 Routing Functionality
+ipv6 route ::/0 <destination>,Default Route to its IPv6 Gateway
+ipv6 route <destination>\<prefix-length> <nexthop>,Create a IPv6 static route
+traceroute <destination>,Traceroute
+ping <destination>,Ping
+ping <destination> source <interface>,Ping With Specific Source
+ping vrf <vrf-name> <destination>,Ping From Specific VRF
+show ip protocols,Displays the configured routing protocols and its parameters
+mpls ip,Activate MPLS on Interface
+mpls label range <startvalue> <endvalue>,Change MPLS Label Range
+mpls ldp explicit-null,Override PHP
+hostname this_is_the_name,Configure the device hostname
+enable secret mysecretpassword,User EXEC Mode Password
+enable password mypassword,Privileged EXEC Mode Password
+security passwords min-length 8,Minimum Password Length
+login block-for 3 attempts tries within 30,Max Log In Attempts
+terminal session-timeout 10,Session timeout
+service password-encryption,Set Password By Encryption
+vlan [number],Create a VLAN or enter VLAN configuration mode.
+no vlan [number],Delete a VLAN.
+switchport access vlan [number],Asign Access Port To Vlan
+router ospf [PID],create OSPF process with Process ID [PID] (1 - 65535)
+router-id [a.b.c.d],manually assign the router an ID in an IPv4 address format.
+show ip ospf neighbor,list of this router's OSPF neighbor routers
+show ip ospf interface,in-detail list of every OSPF-enabled interface
+encapsulation dot1q [vlan-id],configure subinterface to operate on a specified VLAN
+access-list [number] [permit/deny] [address] [wildcard mask],create entry in standard IPv4 ACL with specified number
+ip access-list [standard] [name],creates a standard named ACL. Will take you to standard (std) named ACL (nacl) configuration mode after entering it
+ip nat inside source static [local-add] [global-add],configure static NAT specifying the local address that will be mapped to a global address
+router rip,	enter router configuration mode with RIP as the routing protocol
+show port-security,displays Port Security configuration for all interfaces
+show port-security interface <interface>,displays Port Security configuration of an interface
+switchport mode trunk,configures an interface to specifically be in trunk mode. Also negotiates to convert the neighboring link into a trunk.
+switchport mode access,configures an interface to specifically be in access mode
+switchport mode dynamic auto,interface will convert into a trunk interface if its neighboring interface is in mode trunk or desirable ONLY
+switchport mode dynamic desirable,interface will convert into a trunk interface if its neighboring interface is in mode trunk / dynamic auto / dynamic desirable ONLY
+show version,Display information about IOS and router.
+interface <int>,Enter interface configuration.
+ip address <ip address> <mask>,Assign an IP address to the specified interface.
+shutdown,Turn off an interface
+no shutdown,Turn on an interface
+description <name-string>,Set a description to the interface.
+copy from-location to-location,It copies a file (or set of files) from a location to another location.
+erase nvram,Delete the current startup configuration files. The command returns the device to its factory default.
+reload,Reboot the device. The NVRAM will take the latest configuration.
+erase startup-config,Erase the NVRAM filesystem. The command achieves the similar outcome as “erase nvram”
+spanning-tree mode rapid-pvst,A global configuration command that configures the device for Rapid Per VLAN Spanning Tree protocol.
+spanning-tree vlan <1-4094> priority <0-61440>,Manually set the bridge priority per vlan.
+spanning-tree vlan <1-4094> root primary,Make the switch the root of the spanning tree.
+no spanning-tree vlan <1-4094>,Disable spanning tree on the specific VLAN.
+show spanning-tree summary,Show a summary of all spanning tree instances and ports.
+show spanning-tree detail,Show detailed information of each port in the spanning-tree process.
+show interfaces switchport,Display configuration settings about all the switch port interfaces.
+channel-group <number>,Assign the Etherchannel. Set the interface range to a channel group.
+no switchport access vlan,Remove VLAN assignment from interface. It returns to default VLAN 1
+show vtp status,Display all vtp status
+vtp mode <server | client | transparent>,In the global configuration mode set the device as server / client / or transparent vtp mode.
+switchport trunk native vlan <number>,Set native VLAN to a specific number.
+switchport trunk allowed vlan <number>,Allow specific VLANs on this trunk.
+switchport trunk encapsulation dot1q,Sets the 802.1Q encapsulation on the trunk link.
+ip default-gateway <ip_address>,Set the default gateway for the router.
+ip route 0.0.0.0 0.0.0.0 <next hop>,Configure a default route
+router ospf <process ID>,Enable OSPF with an ID. The command will open the router configuration mode.
+ip nat <inside | outside>,Specific whether the interface is the inside or outside of NAT.
+ip nat inside source <ACL No.> <pool | static IP> <overload>,Configure dynamic NAT. It instructs the router to translate all addresses identified by the ACL on the pool. To configure Port Address Translation (PAT) use the “overload” at the end.
+ip nat inside source static <local IP> <global IP>,Create a static NAT from inside (local IP) to outside (global IP)
+ip nat outside source static <ACL No.> <pool | static IP>,Create a static NAT from outside (ACL) to inside (IP pool)
+ntp peer <ip-address>,Configure the time by synchronizing it from an NTP server.
+ip dhcp excluded-address <first-ip-address> <last-ip-address>,The IP addresses that the DHCP server should not assign to the DHCP client.
+ip dhcp pool <name>,Enters the DHCP pool configuration mode and creates a new DHCP pool.
+network <network ID> <mask>,Inside the DHCP configuration mode. Define the address pool for the DHCP server.
+default-router <IP address>,Set the default gateway IP address for the DHCP clients.
+dns-server <IP address>,Set the DNS server IP address for the DHCP clients.
+ip helper-address <ip address>,Turns an interface into a DHCP bridge. The interface redirects DHCP broadcast packets to a specific IP.
+show ip dhcp pool,Display information about the DHCP pool
+show ip dhcp binding,Display information about all the current DHCP bindings.
+ip dns server,Enable DNS service.
+ip domain-lookup,Enable domain lookup service. DNS client
+ip name-server <IP address | domain name>,Set a public DNS server.
+snmp-server community <community-string>,Enable SNMP Read-Only public community strings.
+snmp-server community <community-string>,Enable SNMP Read-Only private community strings.
+snmp-server host <ip-address> version <community-string>,Specific the hosts to receive the SNMP traps
+logging <ip address>,Determines the Syslog server to send log messages.
+logging trap level,Limit Syslog messages based on severity level
+show logging,Shows the state logging (syslog)
+terminal monitor,Enables debug and system's error messages for the current terminal.
+enable secret <password>,Set an “enable” secret password. Enable secret passwords are hashed via the MD5 algorithm.
+line vty 0 4,A global configuration command to access the virtual terminal configuration. VTY is a virtual port used to access the device via SSH and Telnet. 0 4 to allow five simultaneous virtual connections
+line console 0,A global configuration command to access the console configuration.
+login local,The authentication uses only locally configured credentials.
+username <username> privilege <level> secret <password>,Require a username with a specific password. Also configure different levels of privilege.
+service password-encryption,Makes the device encrypt all passwords saved on the configuration file.
+crypto key generate rsa,Generate a set of RSA key pairs for your device. These keys may be used for remote access via SSH.
+access-list,Defined a numbered ACL
+ip access-list,Defined an IPv4 ACL.
+access-list access-list-number <deny | permit}> source <source> [log],Create a standard ACL.
+access-list access-list-number <deny | permit}> protocol <> source <source [ports]>destination <destination [ports]> [Options],Create an extended ACL.
+ip access-class <access-list-name> <in | out>,A line configuration command mode. It restricts incoming and outgoing connections to a particular vty line. Use “no” to remove the restriction.
+show ip access-list,Show all IPv4 ACLs
+switchport port-security,enable dynamic port security on the specific interface.
+switchport port-security maximum <max value>,Specify the maximum number of secure MAC addresses on the specific interface.
+switchport port-security mac-address <mac-address | sticky [mac-address]>,Force a specific mac-address to the interface. Also use the “sticky” option to make the interface remember the first mac-address connected to the interface.
+switchport port-security violation <shutdown | restrict | protect>,Define the action to be taken when a violation is detected on the port.
+show port security,Display the port security configuration on each interface.
