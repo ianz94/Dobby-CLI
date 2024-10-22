@@ -9,7 +9,7 @@ Yes, just as the name indicates, Dobby-CLI atcs like a smart house-elf who resid
 All you need to do is to summon it in the midst of working on your Cisco switch/router, and talk to it in natural language.
 
 <div align="center">
-  <img src="./assets/Dobby-Demo.gif">
+  <img src="./assets/CLI-Demo-1010.gif">
 </div>
 
 Its capabilities include:
